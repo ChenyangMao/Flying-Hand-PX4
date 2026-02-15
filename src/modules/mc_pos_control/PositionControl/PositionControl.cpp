@@ -268,3 +268,26 @@ void PositionControl::getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_
 	ControlMath::thrustToAttitude(_thr_sp, _yaw_sp, attitude_setpoint);
 	attitude_setpoint.yaw_sp_move_rate = _yawspeed_sp;
 }
+
+void PositionControl::getOmniAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint,
+		omni_attitude_status_s &omni_status)
+{
+	// For omnidirectional mode, compute the NED thrust vector directly from acceleration
+	// without coupling to body tilt (unlike standard _accelerationControl)
+	Vector3f thr_sp_ned = _acc_sp * (_hover_thrust / CONSTANTS_ONE_G) - Vector3f(0.f, 0.f, _hover_thrust);
+
+	// Use omnidirectional attitude conversion
+	float tilt_angle = _omni_att_tilt_angle;
+	float tilt_dir = _omni_att_tilt_dir;
+	float roll = _omni_att_roll;
+	float pitch = _omni_att_pitch;
+
+	ControlMath::thrustToOmniAttitude(thr_sp_ned, _yaw_sp, _att,
+					  _omni_att_mode, _omni_dfc_max_thrust,
+					  tilt_angle, tilt_dir, roll, pitch,
+					  _omni_att_rate, _omni_proj_axes,
+					  attitude_setpoint, omni_status);
+
+	attitude_setpoint.yaw_sp_move_rate = _yawspeed_sp;
+	omni_status.att_mode = (float)_omni_att_mode;
+}

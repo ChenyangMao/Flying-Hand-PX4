@@ -200,6 +200,16 @@ void MulticopterPositionControl::parameters_update(bool force)
 			Vector3f(_param_mpc_xy_vel_d_acc.get(), _param_mpc_xy_vel_d_acc.get(), _param_mpc_z_vel_d_acc.get()));
 		_control.setHorizontalThrustMargin(_param_mpc_thr_xy_marg.get());
 		_control.decoupleHorizontalAndVecticalAcceleration(_param_mpc_acc_decouple.get());
+
+		// Omnidirectional parameters
+		_control.setOmniMode(_param_omni_att_mode.get());
+		_control.setOmniDfcMaxThrust(_param_omni_dfc_max_thr.get());
+		_control.setOmniTiltAngle(math::radians(_param_omni_att_tilt_angle.get()));
+		_control.setOmniTiltDir(math::radians(_param_omni_att_tilt_dir.get()));
+		_control.setOmniRoll(math::radians(_param_omni_att_roll.get()));
+		_control.setOmniPitch(math::radians(_param_omni_att_pitch.get()));
+		_control.setOmniRate(_param_omni_att_rate.get());
+		_control.setOmniProjAxes(_param_omni_proj_axes.get());
 		_goto_control.setParamMpcAccHor(_param_mpc_acc_hor.get());
 		_goto_control.setParamMpcAccDownMax(_param_mpc_acc_down_max.get());
 		_goto_control.setParamMpcAccUpMax(_param_mpc_acc_up_max.get());
@@ -604,7 +614,25 @@ void MulticopterPositionControl::Run()
 
 			// Publish attitude setpoint output
 			vehicle_attitude_setpoint_s attitude_setpoint{};
-			_control.getAttitudeSetpoint(attitude_setpoint);
+
+			if (_control.isOmniMode()) {
+				// Get current vehicle attitude for omni thrust projection
+				vehicle_attitude_s vehicle_attitude;
+
+				if (_vehicle_attitude_sub.update(&vehicle_attitude)) {
+					_control.setCurrentAttitude(matrix::Quatf(vehicle_attitude.q));
+				}
+
+				omni_attitude_status_s omni_status{};
+				_control.getOmniAttitudeSetpoint(attitude_setpoint, omni_status);
+
+				omni_status.timestamp = hrt_absolute_time();
+				_omni_attitude_status_pub.publish(omni_status);
+
+			} else {
+				_control.getAttitudeSetpoint(attitude_setpoint);
+			}
+
 			attitude_setpoint.timestamp = hrt_absolute_time();
 			_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
 

@@ -44,6 +44,7 @@
 #include <uORB/topics/trajectory_setpoint.h>
 #include <uORB/topics/vehicle_attitude_setpoint.h>
 #include <uORB/topics/vehicle_local_position_setpoint.h>
+#include <uORB/topics/omni_attitude_status.h>
 
 struct PositionControlStates {
 	matrix::Vector3f position;
@@ -186,6 +187,30 @@ public:
 	void getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint) const;
 
 	/**
+	 * Get the controllers output attitude setpoint for omnidirectional vehicles.
+	 * Uses the selected omni attitude mode to convert thrust to attitude + body-frame thrust.
+	 * @param attitude_setpoint reference to struct to fill up
+	 * @param omni_status reference to omni attitude status struct to fill up
+	 */
+	void getOmniAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint,
+				     omni_attitude_status_s &omni_status);
+
+	/**
+	 * Set omnidirectional vehicle mode parameters
+	 */
+	void setOmniMode(int att_mode) { _omni_att_mode = att_mode; }
+	void setOmniDfcMaxThrust(float max_thr) { _omni_dfc_max_thrust = max_thr; }
+	void setOmniTiltAngle(float angle) { _omni_att_tilt_angle = angle; }
+	void setOmniTiltDir(float dir) { _omni_att_tilt_dir = dir; }
+	void setOmniRoll(float roll) { _omni_att_roll = roll; }
+	void setOmniPitch(float pitch) { _omni_att_pitch = pitch; }
+	void setOmniRate(float rate) { _omni_att_rate = rate; }
+	void setOmniProjAxes(int proj) { _omni_proj_axes = proj; }
+	void setCurrentAttitude(const matrix::Quatf &att) { _att = att; }
+
+	bool isOmniMode() const { return _omni_att_mode > 0; }
+
+	/**
 	 * All setpoints are set to NAN (uncontrolled). Timestampt zero.
 	 */
 	static const trajectory_setpoint_s empty_trajectory_setpoint;
@@ -233,4 +258,15 @@ private:
 	matrix::Vector3f _thr_sp; /**< desired thrust */
 	float _yaw_sp{}; /**< desired heading */
 	float _yawspeed_sp{}; /** desired yaw-speed */
+
+	// Omnidirectional vehicle state
+	int _omni_att_mode{0}; /**< omnidirectional attitude mode (0=standard) */
+	float _omni_dfc_max_thrust{0.15f}; /**< max direct-force horizontal thrust */
+	float _omni_att_tilt_angle{0.f}; /**< desired tilt angle (rad) */
+	float _omni_att_tilt_dir{0.f}; /**< desired tilt direction (rad) */
+	float _omni_att_roll{0.f}; /**< desired roll (rad) */
+	float _omni_att_pitch{0.f}; /**< desired pitch (rad) */
+	float _omni_att_rate{0.5f}; /**< attitude change rate (deg/loop) */
+	int _omni_proj_axes{1}; /**< thrust projection axes (0=commanded, 1=current) */
+	matrix::Quatf _att; /**< current vehicle attitude */
 };

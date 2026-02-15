@@ -1,0 +1,114 @@
+#!/bin/sh
+#
+# @name Hexarotor x with tilted arms
+#
+# @url http://theairlab.org/
+#
+# @type Hexarotor Fully-Actuated
+# @class Copter
+#
+# @output MAIN1 motor 1
+# @output MAIN2 motor 2
+# @output MAIN3 motor 3
+# @output MAIN4 motor 4
+# @output MAIN5 motor 5
+# @output MAIN6 motor 6
+#
+# @maintainer Azarakhsh Keipour <keipour@cmu.edu>
+#
+# @board bitcraze_crazyflie exclude
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+# MAV_TYPE_HEXAROTOR 13
+param set-default MAV_TYPE 13
+
+# Use 6DOF Motors control allocation for fully-actuated vehicle
+param set-default CA_AIRFRAME 7
+
+param set-default CA_ROTOR_COUNT 6
+
+# Rotor 0: mid_right - axis=[0.5, 0.0, -0.866025], pos=[0.0, 1.0, 0.0], CW
+param set-default CA_ROTOR0_PX 0.0
+param set-default CA_ROTOR0_PY 1.0
+param set-default CA_ROTOR0_PZ 0.0
+param set-default CA_ROTOR0_AX 0.5
+param set-default CA_ROTOR0_AY 0.0
+param set-default CA_ROTOR0_AZ -0.866025
+param set-default CA_ROTOR0_KM -0.05
+
+# Rotor 1: mid_left - axis=[0.5, 0.0, -0.866025], pos=[0.0, -1.0, 0.0], CCW
+param set-default CA_ROTOR1_PX 0.0
+param set-default CA_ROTOR1_PY -1.0
+param set-default CA_ROTOR1_PZ 0.0
+param set-default CA_ROTOR1_AX 0.5
+param set-default CA_ROTOR1_AY 0.0
+param set-default CA_ROTOR1_AZ -0.866025
+param set-default CA_ROTOR1_KM 0.05
+
+# Rotor 2: front_left - axis=[-0.25, -0.4330125, -0.866025], pos=[0.866025, -0.5, 0.0], CW
+param set-default CA_ROTOR2_PX 0.866025
+param set-default CA_ROTOR2_PY -0.5
+param set-default CA_ROTOR2_PZ 0.0
+param set-default CA_ROTOR2_AX -0.25
+param set-default CA_ROTOR2_AY -0.4330125
+param set-default CA_ROTOR2_AZ -0.866025
+param set-default CA_ROTOR2_KM -0.05
+
+# Rotor 3: rear_right - axis=[-0.25, -0.4330125, -0.866025], pos=[-0.866025, 0.5, 0.0], CCW
+param set-default CA_ROTOR3_PX -0.866025
+param set-default CA_ROTOR3_PY 0.5
+param set-default CA_ROTOR3_PZ 0.0
+param set-default CA_ROTOR3_AX -0.25
+param set-default CA_ROTOR3_AY -0.4330125
+param set-default CA_ROTOR3_AZ -0.866025
+param set-default CA_ROTOR3_KM 0.05
+
+# Rotor 4: front_right - axis=[-0.25, 0.4330125, -0.866025], pos=[0.866025, 0.5, 0.0], CCW
+param set-default CA_ROTOR4_PX 0.866025
+param set-default CA_ROTOR4_PY 0.5
+param set-default CA_ROTOR4_PZ 0.0
+param set-default CA_ROTOR4_AX -0.25
+param set-default CA_ROTOR4_AY 0.4330125
+param set-default CA_ROTOR4_AZ -0.866025
+param set-default CA_ROTOR4_KM 0.05
+
+# Rotor 5: rear_left - axis=[-0.25, 0.4330125, -0.866025], pos=[-0.866025, -0.5, 0.0], CW
+param set-default CA_ROTOR5_PX -0.866025
+param set-default CA_ROTOR5_PY -0.5
+param set-default CA_ROTOR5_PZ 0.0
+param set-default CA_ROTOR5_AX -0.25
+param set-default CA_ROTOR5_AY 0.4330125
+param set-default CA_ROTOR5_AZ -0.866025
+param set-default CA_ROTOR5_KM -0.05
+
+# Attitude PID tuning
+param set-default MC_PITCH_P 4.0
+param set-default MC_PITCHRATE_P 0.24
+param set-default MC_PITCHRATE_I 0.09
+param set-default MC_PITCHRATE_D 0.013
+param set-default MC_PITCHRATE_MAX 180.0
+
+param set-default MC_ROLL_P 4.0
+param set-default MC_ROLLRATE_P 0.16
+param set-default MC_ROLLRATE_I 0.07
+param set-default MC_ROLLRATE_D 0.009
+param set-default MC_ROLLRATE_MAX 180.0
+
+param set-default MC_YAW_P 3.0
+param set-default MC_YAWRATE_P 0.2
+param set-default MC_YAWRATE_I 0.1
+param set-default MC_YAWRATE_D 0.0
+param set-default MC_YAW_FF 0.5
+param set-default MC_YAWRATE_MAX 60.0
+
+param set-default MPC_HOLD_MAX_XY 0.25
+param set-default MPC_THR_MIN 0.15
+param set-default MPC_Z_VEL_MAX_DN 2.0
+
+param set-default BAT_N_CELLS 4
+
+# Omnidirectional attitude mode: constant zero tilt
+param set-default OMNI_ATT_MODE 2
+param set-default OMNI_DFC_MAX_THR 0.20

@@ -65,8 +65,10 @@
 #include <uORB/topics/vehicle_constraints.h>
 #include <uORB/topics/vehicle_control_mode.h>
 #include <uORB/topics/vehicle_land_detected.h>
+#include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vehicle_local_position_setpoint.h>
+#include <uORB/topics/omni_attitude_status.h>
 
 using namespace time_literals;
 
@@ -98,6 +100,7 @@ private:
 	uORB::PublicationData<takeoff_status_s>              _takeoff_status_pub{ORB_ID(takeoff_status)};
 	uORB::Publication<vehicle_attitude_setpoint_s>	     _vehicle_attitude_setpoint_pub{ORB_ID(vehicle_attitude_setpoint)};
 	uORB::Publication<vehicle_local_position_setpoint_s> _local_pos_sp_pub{ORB_ID(vehicle_local_position_setpoint)};	/**< vehicle local position setpoint publication */
+	uORB::Publication<omni_attitude_status_s>            _omni_attitude_status_pub{ORB_ID(omni_attitude_status)};	/**< omni attitude status publication */
 
 	uORB::SubscriptionCallbackWorkItem _local_pos_sub{this, ORB_ID(vehicle_local_position)};	/**< vehicle local position */
 
@@ -105,6 +108,7 @@ private:
 
 	uORB::Subscription _hover_thrust_estimate_sub{ORB_ID(hover_thrust_estimate)};
 	uORB::Subscription _trajectory_setpoint_sub{ORB_ID(trajectory_setpoint)};
+	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};	/**< vehicle attitude for omni thrust projection */
 	uORB::Subscription _vehicle_constraints_sub{ORB_ID(vehicle_constraints)};
 	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
@@ -189,7 +193,17 @@ private:
 
 		(ParamFloat<px4::params::MPC_XY_ERR_MAX>) _param_mpc_xy_err_max,
 		(ParamFloat<px4::params::MPC_YAWRAUTO_MAX>) _param_mpc_yawrauto_max,
-		(ParamFloat<px4::params::MPC_YAWRAUTO_ACC>) _param_mpc_yawrauto_acc
+		(ParamFloat<px4::params::MPC_YAWRAUTO_ACC>) _param_mpc_yawrauto_acc,
+
+		// Omnidirectional vehicle parameters
+		(ParamInt<px4::params::OMNI_ATT_MODE>)      _param_omni_att_mode,
+		(ParamFloat<px4::params::OMNI_DFC_MAX_THR>)  _param_omni_dfc_max_thr,
+		(ParamFloat<px4::params::OMNI_ATT_TLT_ANG>)  _param_omni_att_tilt_angle,
+		(ParamFloat<px4::params::OMNI_ATT_TLT_DIR>)  _param_omni_att_tilt_dir,
+		(ParamFloat<px4::params::OMNI_ATT_ROLL>)     _param_omni_att_roll,
+		(ParamFloat<px4::params::OMNI_ATT_PITCH>)    _param_omni_att_pitch,
+		(ParamInt<px4::params::OMNI_PROJ_AXES>)      _param_omni_proj_axes,
+		(ParamFloat<px4::params::OMNI_ATT_RATE>)     _param_omni_att_rate
 	);
 
 	math::WelfordMean<float> _sample_interval_s{};

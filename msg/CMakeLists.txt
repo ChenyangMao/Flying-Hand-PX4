@@ -142,6 +142,7 @@ set(msg_files
 	NpfgStatus.msg
 	ObstacleDistance.msg
 	OffboardControlMode.msg
+	OmniAttitudeStatus.msg
 	OnboardComputerStatus.msg
 	OpenDroneIdArmStatus.msg
 	OpenDroneIdOperatorId.msg

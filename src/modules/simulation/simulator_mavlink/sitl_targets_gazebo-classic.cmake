@@ -76,6 +76,7 @@ if(gazebo_FOUND)
 		boat
 		cloudship
 		glider
+		hexa_scorpion
 		iris
 		iris_dual_gps
 		iris_foggy_lidar
